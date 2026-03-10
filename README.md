@@ -1,174 +1,129 @@
-# Mark Vegas – Art Portfolio
+# Mark Vegas - Art Portfolio
 
-A clean, bento-style art portfolio website for an animator. Built with vanilla HTML/CSS/JS on the frontend and Vercel Serverless Functions + Turso (edge SQLite) on the backend.
+Clean, bento-style portfolio site for an animator.
 
----
+- Frontend: vanilla HTML/CSS/JS
+- Backend: Vercel Serverless Functions
+- Database: Turso (LibSQL)
 
 ## Project Structure
 
-```
+```text
 markvegas/
-├── index.html           # Landing page (portfolio + profile)
-├── admin.html           # Admin panel (password-protected)
-├── style.css            # All styles (bento grid, shared UI)
-├── script.js            # Landing page JS
-├── admin.js             # Admin panel JS
-├── api/
-│   ├── profile.js       # GET / PUT profile
-│   ├── portfolio.js     # GET all / POST new portfolio item
-│   └── portfolio/
-│       └── [id].js      # PUT / DELETE single portfolio item
-├── package.json
-├── vercel.json
-└── README.md
+|- index.html
+|- admin.html
+|- style.css
+|- script.js
+|- admin.js
+|- api/
+|  |- profile.js
+|  |- portfolio.js
+|  |- portfolio/[id].js
+|- vercel.json
+|- package.json
+`- README.md
 ```
 
----
+## Features
 
-## Database Setup (Turso)
+- Public landing page with profile + portfolio grid
+- Admin panel with password gate
+- Profile editing (name, contact, bio, photo URL)
+- Portfolio CRUD (add/edit/delete image or video items)
+- Theme picker in admin (saves color scheme to DB and applies to public page)
 
-### 1. Install the Turso CLI
+## Database Schema
 
-```bash
-# macOS / Linux
-curl -sSfL https://get.tur.so/install.sh | bash
-
-# Windows (WSL recommended, or use the npm package)
-npm install -g @tursodatabase/cli
-```
-
-### 2. Sign up / log in
-
-```bash
-turso auth signup   # first time
-# or
-turso auth login
-```
-
-### 3. Create a database
-
-```bash
-turso db create markvegas
-```
-
-### 4. Get the database URL and auth token
-
-```bash
-turso db show markvegas --url
-turso db tokens create markvegas
-```
-
-Copy the URL (starts with `libsql://`) and the token – you will need them in the next steps.
-
-### 5. Create the tables
-
-Open the Turso shell:
-
-```bash
-turso db shell markvegas
-```
-
-Then run the following SQL:
+The app auto-creates/updates the `profile` table on first profile API call, but this is the intended schema:
 
 ```sql
 CREATE TABLE IF NOT EXISTS profile (
-  id        INTEGER PRIMARY KEY,
-  name      TEXT    NOT NULL DEFAULT '',
-  contact   TEXT    NOT NULL DEFAULT '',
-  bio       TEXT    NOT NULL DEFAULT '',
-  photo_url TEXT    NOT NULL DEFAULT ''
+  id INTEGER PRIMARY KEY,
+  name TEXT DEFAULT '',
+  contact TEXT DEFAULT '',
+  bio TEXT DEFAULT '',
+  photo_url TEXT DEFAULT '',
+  color_scheme TEXT DEFAULT 'default'
 );
 
 CREATE TABLE IF NOT EXISTS portfolio (
-  id         INTEGER  PRIMARY KEY AUTOINCREMENT,
-  type       TEXT     NOT NULL CHECK(type IN ('image','video')),
-  url        TEXT     NOT NULL,
-  caption    TEXT     NOT NULL DEFAULT '',
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  type TEXT NOT NULL CHECK(type IN ('image','video')),
+  url TEXT NOT NULL,
+  caption TEXT DEFAULT '',
   created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
 ```
 
-Exit the shell with `.quit`.
+## Environment Variables
 
----
+Use these as the primary keys:
+
+```env
+TURSO_DATABASE_URL=libsql://your-db.turso.io
+TURSO_AUTH_TOKEN=database_TURSO_AUTH_TOKEN="eyJhbGciOiJFZERTQSIsInR5cCI6IkpXVCJ9.eyJpYXQiOjE3NzMxNjQ3MTAsImlkIjoiMDE5Y2Q4ZGEtNDcwMS03YmI4LWFiOTQtZWY0YjcwNDEzNDRlIiwicmlkIjoiNDU3NDg3YzktN2UyMS00ODEwLThlODctYTJjOTAwZDYyYmZjIn0.4v2RrS-4Gm2FD3hFXPm3BmaCHKyP3dOom9JrnHz8Ek9gY7NXMuju7l1LpvssXDBI6DHRmGjUx1k3B0UomAuGDw"
+database_TURSO_DATABASE_URL="libsql://database-fulvous-school-vercel-icfg-bcu7zzamdox9nbdpkugsrnzd.aws-us-east-1.turso.io"
+```
+
+Backward-compatible keys are also supported by the API:
+
+```env
+TURSO_DB_URL=libsql://your-db.turso.io
+TURSO_DB_AUTH_TOKEN=your-token
+```
 
 ## Local Development
 
-### 1. Install dependencies
+1. Install dependencies:
 
 ```bash
 npm install
 ```
 
-### 2. Create a `.env` file
+2. Create `.env` from template:
 
 ```bash
-cp .env.example .env   # or create it manually
+cp .env.example .env
 ```
 
-`.env`:
-
-```
-TURSO_DB_URL=libsql://<your-database-name>-<your-org>.turso.io
-TURSO_DB_AUTH_TOKEN=<your-auth-token>
-```
-
-### 3. Run locally with Vercel Dev
+3. Run the app:
 
 ```bash
-npx vercel dev
+npm run dev
 ```
 
-The site will be available at `http://localhost:3000`.
+App runs on `http://localhost:3000` via `vercel dev`.
 
----
+## Deploy (Vercel)
 
-## Deployment on Vercel
-
-### 1. Install the Vercel CLI (optional, or use the dashboard)
-
-```bash
-npm install -g vercel
-```
-
-### 2. Link the project
+1. Ensure project is linked:
 
 ```bash
 vercel link
 ```
 
-### 3. Set environment variables in Vercel
+2. Add environment variables in Vercel dashboard (Project Settings -> Environment Variables):
 
-Either via the CLI:
+- `TURSO_DATABASE_URL`
+- `TURSO_AUTH_TOKEN`
 
-```bash
-vercel env add TURSO_DB_URL
-vercel env add TURSO_DB_AUTH_TOKEN
-```
-
-Or in the Vercel dashboard: **Project → Settings → Environment Variables**.
-
-### 4. Deploy
+3. Deploy:
 
 ```bash
 vercel --prod
 ```
 
----
+## Admin Access
 
-## Admin Panel
+- URL: `/admin.html`
+- Current password in code: `markvegas`
+- Auth session is stored in `sessionStorage`
 
-Navigate to `/admin.html` on your deployed site (or `http://localhost:3000/admin.html` locally).
+## API Endpoints
 
-- **Password:** `markvegas`
-- The session is kept in `sessionStorage` (cleared when the browser tab is closed).
-- From the admin panel you can edit the profile (name, bio, contact info, photo URL) and manage portfolio items (add, edit, delete images and videos).
-
----
-
-## Environment Variables Reference
-
-| Variable | Description |
-|---|---|
-| `TURSO_DB_URL` | Turso database URL (`libsql://…`) |
-| `TURSO_DB_AUTH_TOKEN` | Turso authentication token |
+- `GET /api/profile`
+- `PUT /api/profile`
+- `GET /api/portfolio`
+- `POST /api/portfolio`
+- `PUT /api/portfolio/:id`
+- `DELETE /api/portfolio/:id`
