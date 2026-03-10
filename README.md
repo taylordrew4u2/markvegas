@@ -80,13 +80,13 @@ TURSO_DB_AUTH_TOKEN=your-token
 npm install
 ```
 
-2. Create `.env` from template:
+1. Create `.env` from template:
 
 ```bash
 cp .env.example .env
 ```
 
-3. Run the app:
+1. Run the app:
 
 ```bash
 npm run dev
@@ -102,12 +102,12 @@ App runs on `http://localhost:3000` via `vercel dev`.
 vercel link
 ```
 
-2. Add environment variables in Vercel dashboard (Project Settings -> Environment Variables):
+1. Add environment variables in Vercel dashboard (Project Settings -> Environment Variables):
 
 - `TURSO_DATABASE_URL`
 - `TURSO_AUTH_TOKEN`
 
-3. Deploy:
+1. Deploy:
 
 ```bash
 vercel --prod
