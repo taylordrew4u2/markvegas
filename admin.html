@@ -1,137 +1,207 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Admin – Mark Vegas</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="style.css" />
-</head>
-<body class="admin-body">
-
-  <!-- ====== PASSWORD GATE ====== -->
-  <div class="gate" id="gate">
-    <div class="gate-card">
-      <h1>Admin</h1>
-      <p>Enter your password to continue.</p>
-      <form id="gate-form">
-        <div class="form-group">
-          <label for="gate-password">Password</label>
-          <input
-            type="password"
-            id="gate-password"
-            name="password"
-            autocomplete="current-password"
-            required
-          />
-        </div>
-        <button type="submit" class="btn btn-primary btn-full">Sign in</button>
-        <p class="gate-error" id="gate-error">Incorrect password.</p>
-      </form>
-    </div>
-  </div>
-
-  <!-- ====== ADMIN LAYOUT ====== -->
-  <div class="admin-layout" id="admin-layout">
-
-    <!-- Nav -->
-    <nav class="admin-nav">
-      <span class="admin-nav-title">Mark Vegas Admin</span>
-      <div class="admin-nav-links">
-        <button class="nav-btn active" data-panel="profile">Profile</button>
-        <button class="nav-btn" data-panel="portfolio">Portfolio</button>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Admin – Mark Vegas</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body class="admin-body">
+    <!-- ====== PASSWORD GATE ====== -->
+    <div class="gate" id="gate">
+      <div class="gate-card">
+        <h1>Admin</h1>
+        <p>Enter your password to continue.</p>
+        <form id="gate-form">
+          <div class="form-group">
+            <label for="gate-password">Password</label>
+            <input
+              type="password"
+              id="gate-password"
+              name="password"
+              autocomplete="current-password"
+              required
+            />
+          </div>
+          <button type="submit" class="btn btn-primary btn-full">
+            Sign in
+          </button>
+          <p class="gate-error" id="gate-error">Incorrect password.</p>
+        </form>
       </div>
-      <button class="logout-btn" id="logout-btn">Log out</button>
-    </nav>
+    </div>
 
-    <!-- Main content -->
-    <div class="admin-main">
-
-      <!-- ---- PROFILE PANEL ---- -->
-      <section class="admin-panel active" id="panel-profile">
-        <h2 class="panel-title">Profile</h2>
-
-        <div class="form-card">
-          <form id="profile-form">
-            <div class="form-group">
-              <label for="p-name">Name</label>
-              <input type="text" id="p-name" name="name" placeholder="Your full name" />
-            </div>
-            <div class="form-group">
-              <label for="p-contact">Contact Info</label>
-              <textarea
-                id="p-contact"
-                name="contact"
-                rows="3"
-                placeholder="Enter email addresses, URLs, or other contact info — one per line"
-              ></textarea>
-            </div>
-            <div class="form-group">
-              <label for="p-bio">Bio</label>
-              <textarea id="p-bio" name="bio" rows="5" placeholder="A short bio about yourself"></textarea>
-            </div>
-            <div class="form-group">
-              <label for="p-photo">Photo URL</label>
-              <input type="url" id="p-photo" name="photo_url" placeholder="https://example.com/photo.jpg" />
-            </div>
-            <div class="form-group">
-              <button type="submit" class="btn btn-primary" id="profile-save-btn">Save Profile</button>
-              <span class="status-msg" id="profile-status"></span>
-            </div>
-          </form>
+    <!-- ====== ADMIN LAYOUT ====== -->
+    <div class="admin-layout" id="admin-layout">
+      <!-- Nav -->
+      <nav class="admin-nav">
+        <span class="admin-nav-title">Mark Vegas Admin</span>
+        <div class="admin-nav-links">
+          <button class="nav-btn active" data-panel="profile">Profile</button>
+          <button class="nav-btn" data-panel="portfolio">Portfolio</button>
+          <button class="nav-btn" data-panel="theme">Theme</button>
         </div>
-      </section>
+        <button class="logout-btn" id="logout-btn">Log out</button>
+      </nav>
 
-      <!-- ---- PORTFOLIO PANEL ---- -->
-      <section class="admin-panel" id="panel-portfolio">
-        <h2 class="panel-title">Portfolio Items</h2>
+      <!-- Main content -->
+      <div class="admin-main">
+        <!-- ---- PROFILE PANEL ---- -->
+        <section class="admin-panel active" id="panel-profile">
+          <h2 class="panel-title">Profile</h2>
 
-        <!-- Add-item form (inline, toggled) -->
-        <div class="item-form-card" id="add-item-form">
-          <h3 style="margin-bottom:18px;" id="item-form-heading">Add Item</h3>
-          <div class="item-form-grid">
-            <div class="form-group">
-              <label for="item-type">Type</label>
-              <select id="item-type" name="type">
-                <option value="image">Image</option>
-                <option value="video">Video</option>
-              </select>
+          <div class="form-card">
+            <form id="profile-form">
+              <div class="form-group">
+                <label for="p-name">Name</label>
+                <input
+                  type="text"
+                  id="p-name"
+                  name="name"
+                  placeholder="Your full name"
+                />
+              </div>
+              <div class="form-group">
+                <label for="p-contact">Contact Info</label>
+                <textarea
+                  id="p-contact"
+                  name="contact"
+                  rows="3"
+                  placeholder="Enter email addresses, URLs, or other contact info — one per line"
+                ></textarea>
+              </div>
+              <div class="form-group">
+                <label for="p-bio">Bio</label>
+                <textarea
+                  id="p-bio"
+                  name="bio"
+                  rows="5"
+                  placeholder="A short bio about yourself"
+                ></textarea>
+              </div>
+              <div class="form-group">
+                <label for="p-photo">Photo URL</label>
+                <input
+                  type="url"
+                  id="p-photo"
+                  name="photo_url"
+                  placeholder="https://example.com/photo.jpg"
+                />
+              </div>
+              <div class="form-group">
+                <button
+                  type="submit"
+                  class="btn btn-primary"
+                  id="profile-save-btn"
+                >
+                  Save Profile
+                </button>
+                <span class="status-msg" id="profile-status"></span>
+              </div>
+            </form>
+          </div>
+        </section>
+
+        <!-- ---- PORTFOLIO PANEL ---- -->
+        <section class="admin-panel" id="panel-portfolio">
+          <h2 class="panel-title">Portfolio Items</h2>
+
+          <!-- Add-item form (inline, toggled) -->
+          <div class="item-form-card" id="add-item-form">
+            <h3 style="margin-bottom: 18px" id="item-form-heading">Add Item</h3>
+            <div class="item-form-grid">
+              <div class="form-group">
+                <label for="item-type">Type</label>
+                <select id="item-type" name="type">
+                  <option value="image">Image</option>
+                  <option value="video">Video</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label for="item-caption">Caption</label>
+                <input
+                  type="text"
+                  id="item-caption"
+                  name="caption"
+                  placeholder="Item caption"
+                />
+              </div>
+              <div class="form-group" style="grid-column: 1 / -1">
+                <label for="item-url">URL</label>
+                <input
+                  type="url"
+                  id="item-url"
+                  name="url"
+                  placeholder="https://..."
+                />
+              </div>
             </div>
-            <div class="form-group">
-              <label for="item-caption">Caption</label>
-              <input type="text" id="item-caption" name="caption" placeholder="Item caption" />
-            </div>
-            <div class="form-group" style="grid-column: 1 / -1;">
-              <label for="item-url">URL</label>
-              <input type="url" id="item-url" name="url" placeholder="https://..." />
+            <div class="item-form-actions">
+              <button class="btn btn-primary" id="item-save-btn">
+                Add Item
+              </button>
+              <button class="btn btn-secondary" id="item-cancel-btn">
+                Cancel
+              </button>
             </div>
           </div>
-          <div class="item-form-actions">
-            <button class="btn btn-primary" id="item-save-btn">Add Item</button>
-            <button class="btn btn-secondary" id="item-cancel-btn">Cancel</button>
+
+          <!-- Toolbar -->
+          <div class="portfolio-toolbar">
+            <span id="items-count" class="status-msg"></span>
+            <button class="btn btn-primary" id="show-add-btn">Add Item</button>
           </div>
-        </div>
 
-        <!-- Toolbar -->
-        <div class="portfolio-toolbar">
-          <span id="items-count" class="status-msg"></span>
-          <button class="btn btn-primary" id="show-add-btn">Add Item</button>
-        </div>
+          <!-- Items list -->
+          <div class="portfolio-list" id="portfolio-list">
+            <p class="status-msg" id="portfolio-loading">Loading items...</p>
+          </div>
+        </section>
 
-        <!-- Items list -->
-        <div class="portfolio-list" id="portfolio-list">
-          <p class="status-msg" id="portfolio-loading">Loading items...</p>
-        </div>
-      </section>
+        <!-- ---- THEME PANEL ---- -->
+        <section class="admin-panel" id="panel-theme">
+          <h2 class="panel-title">Color Scheme</h2>
+          <p
+            style="
+              margin-bottom: 24px;
+              color: var(--accent-soft);
+              font-size: 0.95rem;
+            "
+          >
+            Choose a color scheme for your public portfolio page.
+          </p>
 
-    </div><!-- /admin-main -->
-  </div><!-- /admin-layout -->
+          <div class="form-card">
+            <div class="theme-grid" id="theme-grid"></div>
+            <div
+              style="
+                margin-top: 24px;
+                display: flex;
+                align-items: center;
+                gap: 12px;
+              "
+            >
+              <button class="btn btn-primary" id="theme-save-btn">
+                Save Theme
+              </button>
+              <span class="status-msg" id="theme-status"></span>
+            </div>
+          </div>
+        </section>
+      </div>
+      <!-- /admin-main -->
+    </div>
+    <!-- /admin-layout -->
 
-  <!-- Toast container -->
-  <div class="toast-container" id="toast-container"></div>
+    <!-- Toast container -->
+    <div class="toast-container" id="toast-container"></div>
 
-  <script src="admin.js"></script>
-</body>
+    <script src="admin.js"></script>
+  </body>
 </html>

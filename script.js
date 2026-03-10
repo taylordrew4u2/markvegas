@@ -59,6 +59,11 @@ async function loadProfile() {
       img.alt = data.name || 'Profile photo';
       placeholder.replaceWith(img);
     }
+
+    // Color scheme
+    if (data.color_scheme && data.color_scheme !== 'default') {
+      document.documentElement.setAttribute('data-theme', data.color_scheme);
+    }
   } catch (err) {
     console.error('Error loading profile:', err);
   }

@@ -13,34 +13,51 @@ export default async function handler(req, res) {
 
   try {
     if (req.method === 'GET') {
-      // Ensure the profile row exists
+      // Ensure the profile row & color_scheme column exist
       await db.execute(
-        `INSERT OR IGNORE INTO profile (id, name, contact, bio, photo_url)
-         VALUES (1, '', '', '', '')`
+        `CREATE TABLE IF NOT EXISTS profile (
+           id INTEGER PRIMARY KEY,
+           name TEXT DEFAULT '',
+           contact TEXT DEFAULT '',
+           bio TEXT DEFAULT '',
+           photo_url TEXT DEFAULT '',
+           color_scheme TEXT DEFAULT 'default'
+         )`
+      );
+      // Add column if upgrading from older schema
+      await db.execute(
+        `ALTER TABLE profile ADD COLUMN color_scheme TEXT DEFAULT 'default'`
+      ).catch(() => {/* column already exists */});
+
+      await db.execute(
+        `INSERT OR IGNORE INTO profile (id, name, contact, bio, photo_url, color_scheme)
+         VALUES (1, '', '', '', '', 'default')`
       );
 
       const result = await db.execute('SELECT * FROM profile WHERE id = 1');
       const row = result.rows[0] ?? {};
       return res.status(200).json({
-        id:        row.id        ?? 1,
-        name:      row.name      ?? '',
-        contact:   row.contact   ?? '',
-        bio:       row.bio       ?? '',
-        photo_url: row.photo_url ?? '',
+        id:           row.id           ?? 1,
+        name:         row.name         ?? '',
+        contact:      row.contact      ?? '',
+        bio:          row.bio          ?? '',
+        photo_url:    row.photo_url    ?? '',
+        color_scheme: row.color_scheme ?? 'default',
       });
     }
 
     if (req.method === 'PUT') {
-      const { name = '', contact = '', bio = '', photo_url = '' } = req.body ?? {};
+      const { name = '', contact = '', bio = '', photo_url = '', color_scheme = 'default' } = req.body ?? {};
       await db.execute({
-        sql: `INSERT INTO profile (id, name, contact, bio, photo_url)
-              VALUES (1, ?, ?, ?, ?)
+        sql: `INSERT INTO profile (id, name, contact, bio, photo_url, color_scheme)
+              VALUES (1, ?, ?, ?, ?, ?)
               ON CONFLICT(id) DO UPDATE SET
-                name      = excluded.name,
-                contact   = excluded.contact,
-                bio       = excluded.bio,
-                photo_url = excluded.photo_url`,
-        args: [name, contact, bio, photo_url],
+                name         = excluded.name,
+                contact      = excluded.contact,
+                bio          = excluded.bio,
+                photo_url    = excluded.photo_url,
+                color_scheme = excluded.color_scheme`,
+        args: [name, contact, bio, photo_url, color_scheme],
       });
       return res.status(200).json({ ok: true });
     }

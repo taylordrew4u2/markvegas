@@ -320,4 +320,117 @@ async function deleteItem(id) {
 function initAdmin() {
   loadProfile();
   loadPortfolio();
+  initThemePicker();
+}
+
+/* =========================================
+   THEME PICKER
+   ========================================= */
+
+const THEMES = [
+  { id: 'default',  name: 'Default',  bg: '#f5f5f0', surface: '#ffffff', accent: '#1a1a1a' },
+  { id: 'dark',     name: 'Dark',     bg: '#121212', surface: '#1e1e1e', accent: '#e8e8e8' },
+  { id: 'warm',     name: 'Warm',     bg: '#faf3eb', surface: '#ffffff', accent: '#3d2b1f' },
+  { id: 'cool',     name: 'Cool',     bg: '#eef2f7', surface: '#ffffff', accent: '#1a2a3a' },
+  { id: 'midnight', name: 'Midnight', bg: '#0d1117', surface: '#161b22', accent: '#c9d1d9' },
+  { id: 'rose',     name: 'Rose',     bg: '#fdf2f4', surface: '#ffffff', accent: '#4a1525' },
+];
+
+let selectedTheme = 'default';
+
+function initThemePicker() {
+  const grid = document.getElementById('theme-grid');
+  grid.innerHTML = '';
+
+  THEMES.forEach(t => {
+    const btn = document.createElement('button');
+    btn.className = 'theme-swatch';
+    btn.dataset.theme = t.id;
+
+    const preview = document.createElement('div');
+    preview.className = 'swatch-preview';
+    preview.style.background = t.bg;
+
+    const c1 = document.createElement('span');
+    c1.style.background = t.surface;
+    const c2 = document.createElement('span');
+    c2.style.background = t.accent;
+
+    preview.appendChild(c1);
+    preview.appendChild(c2);
+
+    const label = document.createElement('div');
+    label.className = 'swatch-label';
+    label.textContent = t.name;
+    label.style.background = t.surface;
+    label.style.color = t.accent;
+
+    btn.appendChild(preview);
+    btn.appendChild(label);
+    grid.appendChild(btn);
+
+    btn.addEventListener('click', () => {
+      selectTheme(t.id);
+    });
+  });
+
+  loadTheme();
+
+  document.getElementById('theme-save-btn').addEventListener('click', saveTheme);
+}
+
+function selectTheme(themeId) {
+  selectedTheme = themeId;
+  document.querySelectorAll('.theme-swatch').forEach(s => {
+    s.classList.toggle('selected', s.dataset.theme === themeId);
+  });
+  // Live preview on the admin page
+  document.documentElement.setAttribute('data-theme', themeId === 'default' ? '' : themeId);
+}
+
+async function loadTheme() {
+  try {
+    const res = await fetch('/api/profile');
+    if (!res.ok) return;
+    const data = await res.json();
+    const theme = data.color_scheme || 'default';
+    selectTheme(theme);
+  } catch (err) {
+    console.error('Error loading theme:', err);
+  }
+}
+
+async function saveTheme() {
+  const btn = document.getElementById('theme-save-btn');
+  btn.disabled = true;
+  btn.textContent = 'Saving...';
+
+  // Read current profile so we don't overwrite other fields
+  try {
+    const getRes = await fetch('/api/profile');
+    if (!getRes.ok) throw new Error('Load failed');
+    const current = await getRes.json();
+
+    const body = {
+      name:         current.name         || '',
+      contact:      current.contact      || '',
+      bio:          current.bio          || '',
+      photo_url:    current.photo_url    || '',
+      color_scheme: selectedTheme,
+    };
+
+    const res = await fetch('/api/profile', {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(body),
+    });
+    if (!res.ok) throw new Error('Save failed');
+    showToast('Theme saved.', 'success');
+  } catch (err) {
+    console.error(err);
+    showToast('Could not save theme.', 'error');
+  } finally {
+    btn.disabled = false;
+    btn.textContent = 'Save Theme';
+  }
 }
