@@ -84,6 +84,7 @@ function showToast(message, type = "success") {
 const profileForm = document.getElementById("profile-form");
 const profileStatus = document.getElementById("profile-status");
 const profileSaveBtn = document.getElementById("profile-save-btn");
+const profilePhotoFileInput = document.getElementById("p-photo-file");
 
 async function loadProfile() {
   try {
@@ -105,6 +106,8 @@ profileForm.addEventListener("submit", async function (e) {
   profileSaveBtn.disabled = true;
   profileSaveBtn.textContent = "Saving...";
 
+  const photoFile = profilePhotoFileInput.files?.[0];
+
   const body = {
     name: document.getElementById("p-name").value.trim(),
     contact: document.getElementById("p-contact").value.trim(),
@@ -113,6 +116,16 @@ profileForm.addEventListener("submit", async function (e) {
   };
 
   try {
+    if (photoFile) {
+      if (!photoFile.type.startsWith("image/")) {
+        throw new Error("Profile photo must be an image file.");
+      }
+      profileSaveBtn.textContent = "Uploading photo...";
+      body.photo_url = await uploadMediaFile(photoFile);
+      document.getElementById("p-photo").value = body.photo_url;
+    }
+
+    profileSaveBtn.textContent = "Saving...";
     const res = await fetch("/api/profile", {
       method: "PUT",
       headers: { "Content-Type": "application/json" },
@@ -120,9 +133,10 @@ profileForm.addEventListener("submit", async function (e) {
     });
     if (!res.ok) throw new Error("Save failed");
     showToast("Profile saved.", "success");
+    profilePhotoFileInput.value = "";
   } catch (err) {
     console.error(err);
-    showToast("Could not save profile.", "error");
+    showToast(err.message || "Could not save profile.", "error");
   } finally {
     profileSaveBtn.disabled = false;
     profileSaveBtn.textContent = "Save Profile";
