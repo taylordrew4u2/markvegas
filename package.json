@@ -1,0 +1,15 @@
+{
+  "name": "markvegas",
+  "version": "1.0.0",
+  "description": "Art portfolio website for an animator",
+  "private": true,
+  "scripts": {
+    "dev": "vercel dev"
+  },
+  "dependencies": {
+    "@libsql/client": "^0.14.0"
+  },
+  "engines": {
+    "node": ">=18"
+  }
+}
