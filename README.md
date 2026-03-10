@@ -113,9 +113,14 @@ vercel link
 vercel --prod
 ```
 
+## Production URLs
+
+- Site: <https://markvegas.space>
+- Admin: <https://markvegas.space/admin.html>
+
 ## Admin Access
 
-- URL: `/admin.html`
+- URL: `https://markvegas.space/admin.html` (or `/admin.html`)
 - Current password in code: `markvegas`
 - Auth session is stored in `sessionStorage`
 
