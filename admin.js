@@ -141,6 +141,7 @@ const itemCancelBtn  = document.getElementById('item-cancel-btn');
 const itemTypeInput  = document.getElementById('item-type');
 const itemUrlInput   = document.getElementById('item-url');
 const itemCaptInput  = document.getElementById('item-caption');
+const itemFileInput  = document.getElementById('item-file');
 
 async function loadPortfolio() {
   portfolioList.innerHTML = '<p class="status-msg">Loading items...</p>';
@@ -226,6 +227,7 @@ showAddBtn.addEventListener('click', function () {
   itemTypeInput.value  = 'image';
   itemUrlInput.value   = '';
   itemCaptInput.value  = '';
+  itemFileInput.value  = '';
   addItemForm.classList.add('open');
   itemUrlInput.focus();
   showAddBtn.disabled = true;
@@ -239,6 +241,7 @@ itemCancelBtn.addEventListener('click', function () {
 function closeItemForm() {
   addItemForm.classList.remove('open');
   editingItemId = null;
+  itemFileInput.value = '';
   showAddBtn.disabled = false;
 }
 
@@ -250,27 +253,59 @@ function openEditForm(item) {
   itemTypeInput.value  = item.type;
   itemUrlInput.value   = item.url;
   itemCaptInput.value  = item.caption || '';
+  itemFileInput.value  = '';
   addItemForm.classList.add('open');
   showAddBtn.disabled = true;
   addItemForm.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
 }
 
+itemFileInput.addEventListener('change', function () {
+  const file = itemFileInput.files?.[0];
+  if (!file) return;
+  if (file.type.startsWith('image/')) itemTypeInput.value = 'image';
+  if (file.type.startsWith('video/')) itemTypeInput.value = 'video';
+});
+
+async function uploadMediaFile(file) {
+  const formData = new FormData();
+  formData.append('file', file);
+
+  const res = await fetch('/api/upload', {
+    method: 'POST',
+    body: formData,
+  });
+
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({}));
+    throw new Error(err.error || 'Upload failed');
+  }
+
+  const data = await res.json();
+  return data.url;
+}
+
 // Save item (add or edit)
 itemSaveBtn.addEventListener('click', async function () {
-  const url     = itemUrlInput.value.trim();
+  let url       = itemUrlInput.value.trim();
   const caption = itemCaptInput.value.trim();
   const type    = itemTypeInput.value;
+  const file    = itemFileInput.files?.[0];
 
-  if (!url) {
-    showToast('Please enter a URL.', 'error');
-    itemUrlInput.focus();
+  if (!url && !file) {
+    showToast('Enter a URL or upload a file.', 'error');
     return;
   }
 
   itemSaveBtn.disabled = true;
-  itemSaveBtn.textContent = 'Saving...';
+  itemSaveBtn.textContent = file ? 'Uploading...' : 'Saving...';
 
   try {
+    if (file) {
+      url = await uploadMediaFile(file);
+      itemUrlInput.value = url;
+      itemSaveBtn.textContent = 'Saving...';
+    }
+
     let res;
     if (editingItemId) {
       res = await fetch('/api/portfolio/' + editingItemId, {

@@ -654,6 +654,12 @@ textarea {
   margin-top: 20px;
 }
 
+.upload-help {
+  margin-top: 8px;
+  font-size: 0.8rem;
+  color: var(--accent-muted);
+}
+
 /* ---- Toast notifications ---- */
 .toast-container {
   position: fixed;
