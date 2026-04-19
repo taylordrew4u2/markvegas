@@ -1,0 +1,59 @@
+{
+	"servers": {
+		"io.github.pubnub/mcp-server": {
+			"type": "stdio",
+			"command": "npx",
+			"args": [
+				"@pubnub/mcp@2.3.2"
+			],
+			"env": {
+				"PUBNUB_API_KEY": "${input:PUBNUB_API_KEY}",
+				"PUBNUB_PUBLISH_KEY": "${input:PUBNUB_PUBLISH_KEY}",
+				"PUBNUB_SUBSCRIBE_KEY": "${input:PUBNUB_SUBSCRIBE_KEY}",
+				"PUBNUB_USER_ID": "${input:PUBNUB_USER_ID}",
+				"PUBNUB_EMAIL": "${input:PUBNUB_EMAIL}",
+				"PUBNUB_PASSWORD": "${input:PUBNUB_PASSWORD}"
+			},
+			"gallery": "https://api.mcp.github.com",
+			"version": "2.3.2"
+		}
+	},
+	"inputs": [
+		{
+			"id": "PUBNUB_API_KEY",
+			"type": "promptString",
+			"description": "Your PubNub API Key. Required for all operations related to your account/keyset",
+			"password": true
+		},
+		{
+			"id": "PUBNUB_PUBLISH_KEY",
+			"type": "promptString",
+			"description": "Optional PubNub publish key for real-time operations",
+			"password": true
+		},
+		{
+			"id": "PUBNUB_SUBSCRIBE_KEY",
+			"type": "promptString",
+			"description": "Optional PubNub subscribe key for real-time operations",
+			"password": true
+		},
+		{
+			"id": "PUBNUB_USER_ID",
+			"type": "promptString",
+			"description": "Optional variable that can be provided to change the User ID for the SDK (real-time) operations (default: pubnub-mcp)",
+			"password": false
+		},
+		{
+			"id": "PUBNUB_EMAIL",
+			"type": "promptString",
+			"description": "(Deprecated - use API Key instead) Your PubNub account email. Required for all operations related to your account/keyset",
+			"password": false
+		},
+		{
+			"id": "PUBNUB_PASSWORD",
+			"type": "promptString",
+			"description": "(Deprecated - use API Key instead) Your PubNub account password. Required for all operations related to your account/keyset",
+			"password": true
+		}
+	]
+}
