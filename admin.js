@@ -1,5 +1,7 @@
 /* admin.js – Admin panel logic */
 
+import { upload as blobUpload } from "https://esm.sh/@vercel/blob@0.27.3/client";
+
 const ADMIN_PASSWORD = "markvegas";
 const SESSION_KEY    = "mv_admin_auth";
 const TOKEN_KEY      = "mv_admin_token";
@@ -317,22 +319,18 @@ itemFileInput.addEventListener("change", function () {
 });
 
 async function uploadMediaFile(file) {
-  const formData = new FormData();
-  formData.append("file", file);
+  const token = sessionStorage.getItem(TOKEN_KEY) || "";
+  const safeName = (file.name || "upload").replace(/[^A-Za-z0-9._-]/g, "_");
+  const pathname = `portfolio/${Date.now()}-${safeName}`;
 
-  const res = await fetch("/api/upload", {
-    method: "POST",
-    headers: authHeaders(),
-    body: formData,
+  const blob = await blobUpload(pathname, file, {
+    access: "public",
+    handleUploadUrl: "/api/upload",
+    clientPayload: JSON.stringify({ token }),
+    contentType: file.type || undefined,
   });
 
-  if (!res.ok) {
-    const err = await res.json().catch(() => ({}));
-    throw new Error(err.error || "Upload failed");
-  }
-
-  const data = await res.json();
-  return data.url;
+  return blob.url;
 }
 
 // Save item (add or edit)
