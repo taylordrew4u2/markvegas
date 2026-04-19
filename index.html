@@ -1,51 +1,80 @@
 <!doctype html>
-<html lang="en">
+<html lang="en" data-theme="noir">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Mark Vegas</title>
+    <meta
+      name="description"
+      content="Mark Vegas — animator, comedian. Brooklyn."
+    />
     <link rel="canonical" href="https://markvegas.space/" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link rel="preconnect" href="https://api.fontshare.com" crossorigin />
     <link
-      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap"
+      href="https://api.fontshare.com/v2/css?f[]=satoshi@400,500,700,900&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=JetBrains+Mono:wght@400;500&display=swap"
       rel="stylesheet"
     />
     <link rel="stylesheet" href="style.css" />
   </head>
   <body>
-    <!-- ====== HERO / PROFILE ====== -->
-    <section class="hero">
-      <div class="container">
-        <div class="hero-inner">
-          <div class="hero-text">
-            <h1 class="hero-name" id="hero-name"></h1>
-            <p class="hero-bio" id="hero-bio"></p>
-            <div class="hero-contact" id="hero-contact"></div>
-          </div>
-          <div class="hero-photo-wrap" id="hero-photo-wrap">
-            <div
-              class="hero-photo-placeholder"
-              id="hero-photo-placeholder"
-            ></div>
-          </div>
+    <div class="site">
+      <header class="site-top">
+        <div class="bar">
+          <div class="brand" id="wordmark">MARK VEGAS</div>
+          <nav class="subnav" id="subnav">
+            <button type="button" data-view="work" class="on">Work</button>
+            <button type="button" data-view="about">About</button>
+            <button type="button" data-view="contact">Contact</button>
+          </nav>
         </div>
-      </div>
-    </section>
+      </header>
 
-    <div class="container">
-      <div class="section-divider"></div>
+      <main class="site-main">
+        <!-- WORK -->
+        <section class="view on" id="view-work" aria-label="Work">
+          <div class="mosaic" id="work-grid">
+            <div class="status-msg" id="work-loading">Loading</div>
+          </div>
+        </section>
+
+        <!-- ABOUT -->
+        <section class="view about" id="view-about" aria-label="About">
+          <p class="kicker">About</p>
+          <h1 class="about-head">
+            A portfolio <em>with a voice.</em>
+          </h1>
+          <div class="about-body">
+            <div class="about-photo-wrap" id="about-photo-wrap">
+              <div class="about-photo-placeholder" id="about-photo"></div>
+            </div>
+            <div class="about-text">
+              <div class="about-name" id="about-name">Mark Vegas</div>
+              <p class="about-bio" id="about-bio"></p>
+            </div>
+          </div>
+        </section>
+
+        <!-- CONTACT -->
+        <section class="view" id="view-contact" aria-label="Contact">
+          <p class="kicker">Contact</p>
+          <h1 class="contact-head">Say <em>hello.</em></h1>
+          <div class="contact-list" id="contact-list"></div>
+        </section>
+      </main>
+
+      <footer class="site-foot">
+        <div class="bar">
+          <span>Mark Vegas</span>
+          <span>Brooklyn · MMXXVI</span>
+        </div>
+      </footer>
     </div>
-
-    <!-- ====== PORTFOLIO GRID ====== -->
-    <section class="portfolio-section">
-      <div class="container">
-        <p class="portfolio-heading">Portfolio</p>
-        <div class="bento-grid" id="bento-grid">
-          <div class="loading-state" id="loading-state">Loading...</div>
-        </div>
-      </div>
-    </section>
 
     <script src="script.js"></script>
   </body>

@@ -1,6 +1,7 @@
-# Mark Vegas - Art Portfolio
+# Mark Vegas — Art Portfolio
 
-Clean, bento-style portfolio site for an animator.
+Bold, editorial portfolio site for an animator. Near-black canvas, oversized
+uppercase display type, full-bleed mosaic tiles where the work is the hero.
 
 - Frontend: vanilla HTML/CSS/JS
 - Backend: Vercel Serverless Functions
@@ -32,11 +33,14 @@ markvegas/
 
 ## Features
 
-- Public landing page with profile + portfolio grid
+- Public landing page with three views (Work / About / Contact) + a mosaic
+  grid of full-bleed portfolio tiles that reveal title + index on hover
 - Admin panel with password gate
 - Profile editing (name, contact, bio, photo URL)
 - Portfolio CRUD (add/edit/delete image or video items)
-- Theme picker in admin (saves color scheme to DB and applies to public page)
+- Theme picker in admin — six schemes: **Noir** (default), **Paper**,
+  **Midnight**, **Bone**, **Ember**, **Steel**. Saved to DB and applied to
+  the public page via `data-theme` on `<html>`.
 
 ## Database Schema
 
