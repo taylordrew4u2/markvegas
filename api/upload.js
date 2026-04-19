@@ -3,6 +3,7 @@ import fs from "node:fs/promises";
 import path from "node:path";
 import formidable from "formidable";
 import { createClient } from "@libsql/client";
+import { requireAuth } from "./_auth.js";
 
 export const config = {
   api: {
@@ -38,7 +39,7 @@ async function ensureMediaTable(db) {
 function parseForm(req) {
   const form = formidable({
     multiples: false,
-    maxFileSize: 200 * 1024 * 1024,
+    maxFileSize: 10 * 1024 * 1024, // 10 MB – serverless memory budget
   });
 
   return new Promise((resolve, reject) => {
@@ -68,6 +69,8 @@ export default async function handler(req, res) {
     res.setHeader("Allow", "POST");
     return res.status(405).json({ error: "Method not allowed" });
   }
+
+  if (!requireAuth(req, res)) return;
 
   try {
     const { files } = await parseForm(req);

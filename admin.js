@@ -1,7 +1,8 @@
 /* admin.js – Admin panel logic */
 
 const ADMIN_PASSWORD = "markvegas";
-const SESSION_KEY = "mv_admin_auth";
+const SESSION_KEY    = "mv_admin_auth";
+const TOKEN_KEY      = "mv_admin_token";
 
 /* =========================================
    AUTH
@@ -24,6 +25,27 @@ function showGate() {
   gateEl.style.display = "flex";
 }
 
+/** Returns the Authorization header object for write requests. */
+function authHeaders() {
+  const token = sessionStorage.getItem(TOKEN_KEY) || '';
+  return { Authorization: "Bearer " + token };
+}
+
+/**
+ * Call after a failed write response. If the server returned 401 the session
+ * is stale – clear it and return to the password gate.
+ */
+function handleUnauthorized(res) {
+  if (res.status === 401) {
+    sessionStorage.removeItem(SESSION_KEY);
+    sessionStorage.removeItem(TOKEN_KEY);
+    showGate();
+    showToast("Session expired. Please log in again.", "error");
+    return true;
+  }
+  return false;
+}
+
 // Check session on load
 if (sessionStorage.getItem(SESSION_KEY) === "true") {
   showAdmin();
@@ -34,6 +56,7 @@ gateForm.addEventListener("submit", function (e) {
   const pw = document.getElementById("gate-password").value;
   if (pw === ADMIN_PASSWORD) {
     sessionStorage.setItem(SESSION_KEY, "true");
+    sessionStorage.setItem(TOKEN_KEY, pw);
     gateError.style.display = "none";
     showAdmin();
   } else {
@@ -43,6 +66,7 @@ gateForm.addEventListener("submit", function (e) {
 
 logoutBtn.addEventListener("click", function () {
   sessionStorage.removeItem(SESSION_KEY);
+  sessionStorage.removeItem(TOKEN_KEY);
   showGate();
 });
 
@@ -109,10 +133,11 @@ profileForm.addEventListener("submit", async function (e) {
   const photoFile = profilePhotoFileInput.files?.[0];
 
   const body = {
-    name: document.getElementById("p-name").value.trim(),
-    contact: document.getElementById("p-contact").value.trim(),
-    bio: document.getElementById("p-bio").value.trim(),
-    photo_url: document.getElementById("p-photo").value.trim(),
+    name:         document.getElementById("p-name").value.trim(),
+    contact:      document.getElementById("p-contact").value.trim(),
+    bio:          document.getElementById("p-bio").value.trim(),
+    photo_url:    document.getElementById("p-photo").value.trim(),
+    color_scheme: selectedTheme,
   };
 
   try {
@@ -128,10 +153,13 @@ profileForm.addEventListener("submit", async function (e) {
     profileSaveBtn.textContent = "Saving...";
     const res = await fetch("/api/profile", {
       method: "PUT",
-      headers: { "Content-Type": "application/json" },
+      headers: { "Content-Type": "application/json", ...authHeaders() },
       body: JSON.stringify(body),
     });
-    if (!res.ok) throw new Error("Save failed");
+    if (!res.ok) {
+      if (handleUnauthorized(res)) return;
+      throw new Error("Save failed");
+    }
     showToast("Profile saved.", "success");
     profilePhotoFileInput.value = "";
   } catch (err) {
@@ -294,6 +322,7 @@ async function uploadMediaFile(file) {
 
   const res = await fetch("/api/upload", {
     method: "POST",
+    headers: authHeaders(),
     body: formData,
   });
 
@@ -332,18 +361,21 @@ itemSaveBtn.addEventListener("click", async function () {
     if (editingItemId) {
       res = await fetch("/api/portfolio/" + editingItemId, {
         method: "PUT",
-        headers: { "Content-Type": "application/json" },
+        headers: { "Content-Type": "application/json", ...authHeaders() },
         body: JSON.stringify({ type, url, caption }),
       });
     } else {
       res = await fetch("/api/portfolio", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: { "Content-Type": "application/json", ...authHeaders() },
         body: JSON.stringify({ type, url, caption }),
       });
     }
 
-    if (!res.ok) throw new Error("Save failed");
+    if (!res.ok) {
+      if (handleUnauthorized(res)) return;
+      throw new Error("Save failed");
+    }
     showToast(editingItemId ? "Item updated." : "Item added.", "success");
     closeItemForm();
     await loadPortfolio();
@@ -360,8 +392,14 @@ itemSaveBtn.addEventListener("click", async function () {
 async function deleteItem(id) {
   if (!confirm("Delete this item? This cannot be undone.")) return;
   try {
-    const res = await fetch("/api/portfolio/" + id, { method: "DELETE" });
-    if (!res.ok) throw new Error("Delete failed");
+    const res = await fetch("/api/portfolio/" + id, {
+      method: "DELETE",
+      headers: authHeaders(),
+    });
+    if (!res.ok) {
+      if (handleUnauthorized(res)) return;
+      throw new Error("Delete failed");
+    }
     showToast("Item deleted.", "success");
     await loadPortfolio();
   } catch (err) {
@@ -469,9 +507,9 @@ function initThemePicker() {
 
   loadTheme();
 
-  document
-    .getElementById("theme-save-btn")
-    .addEventListener("click", saveTheme);
+  const saveBtn = document.getElementById("theme-save-btn");
+  saveBtn.removeEventListener("click", saveTheme);
+  saveBtn.addEventListener("click", saveTheme);
 }
 
 function selectTheme(themeId) {
@@ -519,10 +557,13 @@ async function saveTheme() {
 
     const res = await fetch("/api/profile", {
       method: "PUT",
-      headers: { "Content-Type": "application/json" },
+      headers: { "Content-Type": "application/json", ...authHeaders() },
       body: JSON.stringify(body),
     });
-    if (!res.ok) throw new Error("Save failed");
+    if (!res.ok) {
+      if (handleUnauthorized(res)) return;
+      throw new Error("Save failed");
+    }
     showToast("Theme saved.", "success");
   } catch (err) {
     console.error(err);

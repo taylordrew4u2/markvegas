@@ -1,5 +1,6 @@
 // api/portfolio.js – GET all items / POST new item
 import { createClient } from "@libsql/client";
+import { requireAuth } from "./_auth.js";
 
 function getDb() {
   return createClient({
@@ -47,6 +48,8 @@ export default async function handler(req, res) {
     }
 
     if (req.method === "POST") {
+      if (!requireAuth(req, res)) return;
+
       const { type, url, caption = "" } = req.body ?? {};
 
       if (!type || !url) {

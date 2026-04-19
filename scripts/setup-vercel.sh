@@ -40,11 +40,23 @@ fi
 ENV_FILE="${ENV_FILE:-.env}"
 if [ -f "$ENV_FILE" ]; then
   info "Pushing env vars from $ENV_FILE to Vercel (production, preview, development)"
-  # shellcheck disable=SC1090
-  set -a; . "$ENV_FILE"; set +a
+
+  # Parse key=value pairs safely instead of sourcing the file.
+  # Supports optional surrounding quotes; ignores comments and blank lines.
+  get_env_value() {
+    local key="$1"
+    # Use fixed-string grep (-F) to avoid regex injection from key names.
+    grep -F "${key}=" "$ENV_FILE" \
+      | grep -E "^${key}=" \
+      | head -1 \
+      | cut -d= -f2- \
+      | sed -e "s/^['\"]//;s/['\"]$//"
+  }
 
   push_env() {
-    local key="$1" value="${!1:-}"
+    local key="$1"
+    local value
+    value="$(get_env_value "$key")"
     if [ -z "$value" ]; then
       warn "$key is empty in $ENV_FILE — skipping"
       return

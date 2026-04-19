@@ -1,5 +1,6 @@
 // api/profile.js – GET / PUT profile
 import { createClient } from '@libsql/client';
+import { requireAuth } from './_auth.js';
 
 function getDb() {
   return createClient({
@@ -53,18 +54,41 @@ export default async function handler(req, res) {
     }
 
     if (req.method === 'PUT') {
-      const { name = '', contact = '', bio = '', photo_url = '', color_scheme = 'default' } = req.body ?? {};
-      await db.execute({
-        sql: `INSERT INTO profile (id, name, contact, bio, photo_url, color_scheme)
-              VALUES (1, ?, ?, ?, ?, ?)
-              ON CONFLICT(id) DO UPDATE SET
-                name         = excluded.name,
-                contact      = excluded.contact,
-                bio          = excluded.bio,
-                photo_url    = excluded.photo_url,
-                color_scheme = excluded.color_scheme`,
-        args: [name, contact, bio, photo_url, color_scheme],
-      });
+      if (!requireAuth(req, res)) return;
+
+      const body = req.body ?? {};
+      const name      = body.name      ?? '';
+      const contact   = body.contact   ?? '';
+      const bio       = body.bio       ?? '';
+      const photo_url = body.photo_url ?? '';
+
+      // Only update color_scheme when the client explicitly sends it so
+      // saving the profile form never overwrites a previously chosen theme.
+      if ('color_scheme' in body) {
+        const color_scheme = body.color_scheme ?? 'default';
+        await db.execute({
+          sql: `INSERT INTO profile (id, name, contact, bio, photo_url, color_scheme)
+                VALUES (1, ?, ?, ?, ?, ?)
+                ON CONFLICT(id) DO UPDATE SET
+                  name         = excluded.name,
+                  contact      = excluded.contact,
+                  bio          = excluded.bio,
+                  photo_url    = excluded.photo_url,
+                  color_scheme = excluded.color_scheme`,
+          args: [name, contact, bio, photo_url, color_scheme],
+        });
+      } else {
+        await db.execute({
+          sql: `INSERT INTO profile (id, name, contact, bio, photo_url)
+                VALUES (1, ?, ?, ?, ?)
+                ON CONFLICT(id) DO UPDATE SET
+                  name      = excluded.name,
+                  contact   = excluded.contact,
+                  bio       = excluded.bio,
+                  photo_url = excluded.photo_url`,
+          args: [name, contact, bio, photo_url],
+        });
+      }
       return res.status(200).json({ ok: true });
     }
 

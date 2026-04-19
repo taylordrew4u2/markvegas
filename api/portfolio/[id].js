@@ -1,5 +1,6 @@
 // api/portfolio/[id].js – PUT (update) / DELETE a single portfolio item
 import { createClient } from "@libsql/client";
+import { requireAuth } from "../_auth.js";
 
 function getDb() {
   return createClient({
@@ -40,6 +41,8 @@ export default async function handler(req, res) {
     await ensurePortfolioTable(db);
 
     if (req.method === "PUT") {
+      if (!requireAuth(req, res)) return;
+
       const { type, url, caption = "" } = req.body ?? {};
 
       if (!type || !url) {
@@ -63,6 +66,8 @@ export default async function handler(req, res) {
     }
 
     if (req.method === "DELETE") {
+      if (!requireAuth(req, res)) return;
+
       const result = await db.execute({
         sql: "DELETE FROM portfolio WHERE id = ?",
         args: [itemId],

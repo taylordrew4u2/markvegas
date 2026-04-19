@@ -61,8 +61,11 @@ Use these as the primary keys:
 
 ```env
 TURSO_DATABASE_URL=libsql://your-db.turso.io
-TURSO_AUTH_TOKEN=database_TURSO_AUTH_TOKEN="eyJhbGciOiJFZERTQSIsInR5cCI6IkpXVCJ9.eyJpYXQiOjE3NzMxNjQ3MTAsImlkIjoiMDE5Y2Q4ZGEtNDcwMS03YmI4LWFiOTQtZWY0YjcwNDEzNDRlIiwicmlkIjoiNDU3NDg3YzktN2UyMS00ODEwLThlODctYTJjOTAwZDYyYmZjIn0.4v2RrS-4Gm2FD3hFXPm3BmaCHKyP3dOom9JrnHz8Ek9gY7NXMuju7l1LpvssXDBI6DHRmGjUx1k3B0UomAuGDw"
-database_TURSO_DATABASE_URL="libsql://database-fulvous-school-vercel-icfg-bcu7zzamdox9nbdpkugsrnzd.aws-us-east-1.turso.io"
+TURSO_AUTH_TOKEN=your-auth-token
+
+# Secret used to authorise all admin write requests (profile, portfolio, upload).
+# Defaults to "markvegas" when not set — CHANGE THIS before deploying publicly.
+ADMIN_SECRET=change-me-to-a-strong-random-value
 ```
 
 Backward-compatible keys are also supported by the API:
