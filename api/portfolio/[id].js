@@ -1,5 +1,5 @@
 // api/portfolio/[id].js – PUT (update) / DELETE a single portfolio item
-import { createClient } from "@libsql/client";
+import { createClient } from "@tursodatabase/serverless/compat";
 import { requireAuth } from "../_auth.js";
 
 function getDb() {
