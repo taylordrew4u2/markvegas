@@ -4,7 +4,8 @@
   "description": "Art portfolio website for an animator",
   "private": true,
   "scripts": {
-    "dev": "vercel dev"
+    "dev": "vercel dev",
+    "setup": "bash scripts/setup-vercel.sh"
   },
   "dependencies": {
     "@libsql/client": "^0.14.0",
