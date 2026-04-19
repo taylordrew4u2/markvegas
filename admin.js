@@ -422,50 +422,59 @@ function initAdmin() {
 
 const THEMES = [
   {
-    id: "default",
-    name: "Default",
-    bg: "#f5f5f0",
-    surface: "#ffffff",
-    accent: "#1a1a1a",
+    id: "noir",
+    name: "Noir",
+    bg: "#0a0a0a",
+    surface: "#141010",
+    accent: "#c8593f",
   },
   {
-    id: "dark",
-    name: "Dark",
-    bg: "#121212",
-    surface: "#1e1e1e",
-    accent: "#e8e8e8",
-  },
-  {
-    id: "warm",
-    name: "Warm",
-    bg: "#faf3eb",
-    surface: "#ffffff",
-    accent: "#3d2b1f",
-  },
-  {
-    id: "cool",
-    name: "Cool",
-    bg: "#eef2f7",
-    surface: "#ffffff",
-    accent: "#1a2a3a",
+    id: "paper",
+    name: "Paper",
+    bg: "#faf8f3",
+    surface: "#f1eee7",
+    accent: "#c8593f",
   },
   {
     id: "midnight",
     name: "Midnight",
-    bg: "#0d1117",
-    surface: "#161b22",
-    accent: "#c9d1d9",
+    bg: "#0b0f17",
+    surface: "#10141d",
+    accent: "#86b9d9",
   },
   {
-    id: "rose",
-    name: "Rose",
-    bg: "#fdf2f4",
-    surface: "#ffffff",
-    accent: "#4a1525",
+    id: "bone",
+    name: "Bone",
+    bg: "#f5f2eb",
+    surface: "#ece8df",
+    accent: "#93a878",
+  },
+  {
+    id: "ember",
+    name: "Ember",
+    bg: "#0e0a09",
+    surface: "#18100d",
+    accent: "#8a2c2c",
+  },
+  {
+    id: "steel",
+    name: "Steel",
+    bg: "#0c0f12",
+    surface: "#12161b",
+    accent: "#c8593f",
   },
 ];
 
-let selectedTheme = "default";
+/* Legacy ids → current ids, so existing DB values keep working. */
+const THEME_ALIASES = {
+  default: "noir",
+  dark: "noir",
+  warm: "paper",
+  cool: "midnight",
+  rose: "paper",
+};
+
+let selectedTheme = "noir";
 
 function initThemePicker() {
   const grid = document.getElementById("theme-grid");
@@ -510,16 +519,19 @@ function initThemePicker() {
   saveBtn.addEventListener("click", saveTheme);
 }
 
+function resolveTheme(raw) {
+  const key = (raw || "").toLowerCase().trim();
+  if (THEMES.some((t) => t.id === key)) return key;
+  return THEME_ALIASES[key] || "noir";
+}
+
 function selectTheme(themeId) {
-  selectedTheme = themeId;
+  const resolved = resolveTheme(themeId);
+  selectedTheme = resolved;
   document.querySelectorAll(".theme-swatch").forEach((s) => {
-    s.classList.toggle("selected", s.dataset.theme === themeId);
+    s.classList.toggle("selected", s.dataset.theme === resolved);
   });
-  // Live preview on the admin page
-  document.documentElement.setAttribute(
-    "data-theme",
-    themeId === "default" ? "" : themeId,
-  );
+  document.documentElement.setAttribute("data-theme", resolved);
 }
 
 async function loadTheme() {
@@ -527,8 +539,7 @@ async function loadTheme() {
     const res = await fetch("/api/profile");
     if (!res.ok) return;
     const data = await res.json();
-    const theme = data.color_scheme || "default";
-    selectTheme(theme);
+    selectTheme(data.color_scheme);
   } catch (err) {
     console.error("Error loading theme:", err);
   }
