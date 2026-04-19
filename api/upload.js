@@ -2,7 +2,7 @@
 import fs from "node:fs/promises";
 import path from "node:path";
 import formidable from "formidable";
-import { createClient } from "@libsql/client";
+import { createClient } from "@tursodatabase/serverless/compat";
 import { requireAuth } from "./_auth.js";
 
 export const config = {

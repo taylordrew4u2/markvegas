@@ -1,5 +1,5 @@
 // api/media/[id].js – serve uploaded media from Turso
-import { createClient } from "@libsql/client";
+import { createClient } from "@tursodatabase/serverless/compat";
 
 function getDb() {
   return createClient({

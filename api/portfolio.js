@@ -1,5 +1,5 @@
 // api/portfolio.js – GET all items / POST new item
-import { createClient } from "@libsql/client";
+import { createClient } from "@tursodatabase/serverless/compat";
 import { requireAuth } from "./_auth.js";
 
 function getDb() {
