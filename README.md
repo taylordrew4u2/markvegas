@@ -5,6 +5,7 @@ Clean, bento-style portfolio site for an animator.
 - Frontend: vanilla HTML/CSS/JS
 - Backend: Vercel Serverless Functions
 - Database: Turso (LibSQL)
+- Media storage: Vercel Blob (direct browser-to-Blob uploads)
 
 ## Project Structure
 
@@ -16,9 +17,14 @@ markvegas/
 |- script.js
 |- admin.js
 |- api/
+|  |- _auth.js
 |  |- profile.js
 |  |- portfolio.js
 |  |- portfolio/[id].js
+|  |- upload.js           # Vercel Blob client-upload token endpoint
+|  |- media/[id].js       # Legacy: serve media stored as Turso BLOB rows
+|- scripts/
+|  `- setup-vercel.sh
 |- vercel.json
 |- package.json
 `- README.md
@@ -66,6 +72,11 @@ TURSO_AUTH_TOKEN=your-auth-token
 # Secret used to authorise all admin write requests (profile, portfolio, upload).
 # Defaults to "markvegas" when not set — CHANGE THIS before deploying publicly.
 ADMIN_SECRET=change-me-to-a-strong-random-value
+
+# Vercel Blob read/write token – required for /api/upload. Vercel injects
+# this automatically in production once a Blob store is connected to the
+# project; set it locally for `vercel dev`.
+BLOB_READ_WRITE_TOKEN=vercel_blob_rw_xxx
 ```
 
 Backward-compatible keys are also supported by the API:
@@ -74,6 +85,30 @@ Backward-compatible keys are also supported by the API:
 TURSO_DB_URL=libsql://your-db.turso.io
 TURSO_DB_AUTH_TOKEN=your-token
 ```
+
+## Media Uploads (Vercel Blob)
+
+Portfolio images and videos are uploaded directly from the browser to
+Vercel Blob, bypassing the 4.5 MB serverless function body limit. The flow:
+
+1. Admin UI calls `blobUpload()` from `@vercel/blob/client`, passing the
+   admin token inside `clientPayload`.
+2. `/api/upload` validates the token and mints a one-time client upload
+   token (max 2 GB, restricted to image/video MIME types).
+3. The browser streams the file straight to Blob storage and receives a
+   public URL, which is then saved to the `portfolio` table via
+   `POST /api/portfolio`.
+
+### Setting up a Blob store
+
+1. In the Vercel dashboard, open the project and go to **Storage →
+   Create → Blob**.
+2. Name the store and click **Connect to Project** (choose Production,
+   Preview, and Development).
+3. Vercel adds `BLOB_READ_WRITE_TOKEN` to the project's environment
+   variables automatically.
+4. For local dev, run `vercel env pull` to sync the token into
+   `.vercel/.env.development.local`, or copy the value into `.env`.
 
 ## Local Development
 
@@ -109,6 +144,8 @@ vercel link
 
 - `TURSO_DATABASE_URL`
 - `TURSO_AUTH_TOKEN`
+- `ADMIN_SECRET`
+- `BLOB_READ_WRITE_TOKEN` (auto-added when you connect a Blob store)
 
 1. Deploy:
 
@@ -135,3 +172,10 @@ vercel --prod
 - `POST /api/portfolio`
 - `PUT /api/portfolio/:id`
 - `DELETE /api/portfolio/:id`
+- `POST /api/upload` — issues a Vercel Blob client-upload token (admin only)
+- `GET  /api/media/:id` — legacy endpoint for items stored as Turso BLOB rows
+
+All write endpoints require `Authorization: Bearer <ADMIN_SECRET>`, except
+`/api/upload`, which receives the admin token through the Blob client's
+`clientPayload` field (the `@vercel/blob` client does not allow custom
+request headers).
