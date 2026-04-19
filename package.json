@@ -3,6 +3,7 @@
   "version": "1.0.0",
   "description": "Art portfolio website for an animator",
   "private": true,
+  "type": "module",
   "scripts": {
     "dev": "vercel dev",
     "setup": "bash scripts/setup-vercel.sh"

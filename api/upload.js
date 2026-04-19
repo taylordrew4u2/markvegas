@@ -39,7 +39,7 @@ async function ensureMediaTable(db) {
 function parseForm(req) {
   const form = formidable({
     multiples: false,
-    maxFileSize: 10 * 1024 * 1024, // 10 MB – serverless memory budget
+    maxFileSize: 4 * 1024 * 1024, // 4 MB — Vercel serverless body limit is 4.5 MB
   });
 
   return new Promise((resolve, reject) => {
